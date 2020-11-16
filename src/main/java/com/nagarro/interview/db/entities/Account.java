@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.NoArgsConstructor;
+
 /**
  * Account.java This is a model class represents Account entity
  * 
@@ -32,10 +33,6 @@ public class Account {
 	private String accountType;
 	@Column(name = "account_number")
 	private String accountNumber;
-	
-	
-	
-	
 
 	public long getId() {
 		return id;
@@ -65,7 +62,5 @@ public class Account {
 	public String toString() {
 		return "Account ;[id=" + id + ", accountType=" + accountType + ", accountNumber=" + accountNumber + "]";
 	}
-	
-	
 
 }

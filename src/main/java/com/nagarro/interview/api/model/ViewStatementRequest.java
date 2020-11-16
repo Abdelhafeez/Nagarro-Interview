@@ -2,8 +2,11 @@ package com.nagarro.interview.api.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import javax.annotation.security.RolesAllowed;
-import javax.validation.constraints.*;
+
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nagarro.interview.api.validator.ValidAmountRange;
 import com.nagarro.interview.api.validator.ValidDateRange;
@@ -24,7 +27,7 @@ import lombok.NoArgsConstructor;
 @ValidDateRange(message = "{message.validation.invalidAmountRange}")
 public class ViewStatementRequest {
 	@NotBlank(message = "{message.validation.accountId.required}")
-	@Pattern(regexp="[\\d]{13}",message = "{message.validation.accountId.invalid}")
+	@Pattern(regexp = "[\\d]{13}", message = "{message.validation.accountId.invalid}")
 	private String accountId;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
@@ -46,6 +49,7 @@ public class ViewStatementRequest {
 	public void setAccountId(String accountId) {
 		this.accountId = accountId;
 	}
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
 	public LocalDate getFromDate() {
 		return fromDate;
@@ -54,6 +58,7 @@ public class ViewStatementRequest {
 	public void setFromDate(LocalDate fromDate) {
 		this.fromDate = fromDate;
 	}
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
 	public LocalDate getToDate() {
 		return toDate;
@@ -78,15 +83,11 @@ public class ViewStatementRequest {
 	public void setToAmount(BigDecimal toAmount) {
 		this.toAmount = toAmount;
 	}
-	
-	
 
 	@Override
 	public String toString() {
 		return "ViewStatementRequest [accountId=" + accountId + ", fromDate=" + fromDate + ", toDate=" + toDate
 				+ ", fromAmount=" + fromAmount + ", toAmount=" + toAmount + "]";
 	}
-	
-	
 
 }

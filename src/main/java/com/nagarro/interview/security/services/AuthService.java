@@ -9,32 +9,24 @@ import org.springframework.stereotype.Service;
 
 import com.nagarro.interview.security.jwt.APITokenProvider;
 
-
-
 @Service
 public class AuthService {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+	@Autowired
+	AuthenticationManager authenticationManager;
 
-    @Autowired
-    APITokenProvider jwtProvider;
+	@Autowired
+	APITokenProvider jwtProvider;
 
+	public Authentication authenticate(String userName, String password) {
+		Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
 
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		return authentication;
+	}
 
-    public Authentication authenticate(String userName, String password){
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        userName,
-                        password
-                )
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return authentication;
-    }
-
-    public String generateJwtToken(Authentication authentication){
-       return jwtProvider.generateJwtToken(authentication);
-    }
+	public String generateJwtToken(Authentication authentication) {
+		return jwtProvider.generateJwtToken(authentication);
+	}
 }

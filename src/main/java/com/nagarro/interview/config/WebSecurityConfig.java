@@ -23,66 +23,55 @@ import com.nagarro.interview.security.services.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-		prePostEnabled = true
-)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    UserDetailsServiceImpl userDetailsService;
+	@Autowired
+	UserDetailsServiceImpl userDetailsService;
 
-    @Autowired
-    private APIAuthenticationEntryPoint unauthorizedAccessHandler;
+	@Autowired
+	private APIAuthenticationEntryPoint unauthorizedAccessHandler;
 
-    @Bean
-    public AuthenticationTokenFilter authenticationTokenFilter() {
-        return new AuthenticationTokenFilter();
-    }
+	@Bean
+	public AuthenticationTokenFilter authenticationTokenFilter() {
+		return new AuthenticationTokenFilter();
+	}
 
-    @Bean
-    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public  InMemoryTokenValut inMemoryTokenValut(){
-    	return new InMemoryTokenValut();
+	@Bean
+	@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+	public InMemoryTokenValut inMemoryTokenValut() {
+		return new InMemoryTokenValut();
 
-    }
-    @Override
-    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
-    }
-    
-    
+	}
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+	@Override
+	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+		authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+	}
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
 
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-        httpSecurity.cors().and().csrf().disable();
+	@Override
+	protected void configure(HttpSecurity httpSecurity) throws Exception {
+		httpSecurity.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        httpSecurity.authorizeRequests()
-                .antMatchers("/api/auth/login/**").permitAll()
-                .antMatchers("/v2/api-docs/**").permitAll()
-                .antMatchers("/webjars/**").permitAll()
-                .antMatchers("/swagger-ui.html/**").permitAll()
-                .antMatchers("/swagger-resources/**").permitAll()
+		httpSecurity.cors().and().csrf().disable();
 
-               
+		httpSecurity.authorizeRequests().antMatchers("/api/auth/login/**").permitAll().antMatchers("/v2/api-docs/**")
+				.permitAll().antMatchers("/webjars/**").permitAll().antMatchers("/swagger-ui.html/**").permitAll()
+				.antMatchers("/swagger-resources/**").permitAll()
 
-                .anyRequest().authenticated()
-                .and()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedAccessHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    }
+				.anyRequest().authenticated().and().exceptionHandling()
+				.authenticationEntryPoint(unauthorizedAccessHandler).and().sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+	}
 }

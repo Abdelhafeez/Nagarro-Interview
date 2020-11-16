@@ -1,7 +1,5 @@
 package com.nagarro.interview.controller;
 
-import static org.junit.Assert.assertThat;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -116,11 +114,7 @@ public class StatementApiIntegrationTests {
 		// Verify request succeed
 		Assert.assertEquals(test.getExpectedHttpResponse(), result.getStatusCodeValue());
 		if(result.getStatusCodeValue()==200)
-		{
-			System.out.println("**********************88");
-			System.out.println("**********************"+result.getBody().toString());
-
-			ViewStatementRequest r =test.getRequestTestCase();
+		{			ViewStatementRequest r =test.getRequestTestCase();
 			ObjectMapper objectMapper = new ObjectMapper();
 			ViewStatementResponse respObj = objectMapper.readValue(result.getBody().toString(), ViewStatementResponse.class);	
 			//make sure that the data is consistent
@@ -206,8 +200,8 @@ public class StatementApiIntegrationTests {
 		 String url = "http://localhost:" + randomServerPort + "/api/auth/logout";
 
 		try {
-			HttpStatus status =logOut(adminToken, url);
-			HttpStatus status2 =logOut(userToken, url);
+			logOut(adminToken, url);
+			logOut(userToken, url);
 
 			
 		}

@@ -33,30 +33,30 @@ public class FetchStatmentsService {
 		List<Statement> stats;
 		if (isPeriodDetermined)
 			stats = session
-					.createQuery("SELECT b FROM Statement b where b.accountId=" + account.get().getId() ,
-							Statement.class)
+					.createQuery(
+							"SELECT b FROM Statement b where b.accountId=" + account.get().getId(), Statement.class)
 					.stream()
 					.filter(st -> LocalDate.parse(st.getDate(), formatter).compareTo(request.getFromDate()) >= 0
 							&& LocalDate.parse(st.getDate(), formatter).compareTo(request.getToDate()) <= 0
-							&& ( request.getToAmount()==null?true:
-								(st.getAmount().compareTo(request.getFromAmount())>=0 && st.getAmount().compareTo(request.getToAmount())<=0))
-					).collect(Collectors.toList());
+							&& (request.getToAmount() == null ? true
+									: (st.getAmount().compareTo(request.getFromAmount()) >= 0
+											&& st.getAmount().compareTo(request.getToAmount()) <= 0)))
+					.collect(Collectors.toList());
 		else {
 			LocalDate beforePeriod = LocalDate.now().minusMonths(3);
 			stats = session
-					.createQuery("SELECT b FROM Statement b where b.accountId=" + account.get().getId() ,
-							Statement.class)
-					.stream().filter(st -> LocalDate.parse(st.getDate(), formatter).compareTo(beforePeriod) >= 0
-					&& ( request.getToAmount()==null?true:
-							(st.getAmount().compareTo(request.getFromAmount())>=0 && st.getAmount().compareTo(request.getToAmount())<=0))
-				
-							)
-					.collect(Collectors.toList());
+					.createQuery(
+							"SELECT b FROM Statement b where b.accountId=" + account.get().getId(), Statement.class)
+					.stream()
+					.filter(st -> LocalDate.parse(st.getDate(), formatter).compareTo(beforePeriod) >= 0
+							&& (request.getToAmount() == null ? true
+									: (st.getAmount().compareTo(request.getFromAmount()) >= 0
+											&& st.getAmount().compareTo(request.getToAmount()) <= 0))
+
+					).collect(Collectors.toList());
 		}
 		return new ViewStatementResponse(stats, account.get(), "Success");
 
 	}
-
-	
 
 }

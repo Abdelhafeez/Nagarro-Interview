@@ -15,34 +15,28 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class NagrooDemoApplication extends SpringBootServletInitializer {
 
-	 
-	
-    @Override
-    protected SpringApplicationBuilder configure(
-            SpringApplicationBuilder builder) {
-        return builder.sources(NagrooDemoApplication.class);
-    }
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+		return builder.sources(NagrooDemoApplication.class);
+	}
 
-    public static void main(String[] args) {
-        SpringApplication.run(NagrooDemoApplication.class, args);
-    }
-    
+	public static void main(String[] args) {
+		SpringApplication.run(NagrooDemoApplication.class, args);
+	}
+
 	@Bean
 	public MessageSource validationMessageSource() {
-	    ReloadableResourceBundleMessageSource messageSource
-	      = new ReloadableResourceBundleMessageSource();
-	    messageSource.setBasename("classpath:validations");
-	    messageSource.setDefaultEncoding("UTF-8");
-	    return messageSource;
-	}
-	
-	
-	@Bean
-	public LocalValidatorFactoryBean getValidator() {
-	    LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-	    bean.setValidationMessageSource(validationMessageSource());
-	    return bean;
+		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+		messageSource.setBasename("classpath:validations");
+		messageSource.setDefaultEncoding("UTF-8");
+		return messageSource;
 	}
 
+	@Bean
+	public LocalValidatorFactoryBean getValidator() {
+		LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+		bean.setValidationMessageSource(validationMessageSource());
+		return bean;
+	}
 
 }

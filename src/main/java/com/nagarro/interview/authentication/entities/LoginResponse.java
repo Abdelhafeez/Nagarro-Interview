@@ -4,8 +4,9 @@ import com.nagarro.interview.utils.Constants;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
 /**
- * LoginResponse.java , this class represents model of LoginResponse 
+ * LoginResponse.java , this class represents model of LoginResponse
  * 
  * @author Abdalhafeez Bushara
  *
@@ -13,12 +14,12 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class LoginResponse {
-    private String token;
-    private String type = Constants.APP_TOKEN_TYPE;
-    private String message;
+	private String token;
+	private String type = Constants.APP_TOKEN_TYPE;
+	private String message;
 
-    public LoginResponse(String accessToken, String message) {
-        this.token = accessToken;
-        this.message = message;
-    }
+	public LoginResponse(String accessToken, String message) {
+		this.token = accessToken;
+		this.message = message;
+	}
 }

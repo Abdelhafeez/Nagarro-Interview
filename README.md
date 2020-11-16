@@ -40,12 +40,12 @@ password: userpassword
 Automated integration unit test can be run , all code in test package
 
 # Manual Testing
-It's better to go through the swagger-ui documentation to get full description on alll apis http://localhost:8081/swagger-ui.html
-* Login API (/api/auth/login)
+It's better to go through the swagger-ui documentation to get full description on alll apis http://localhost:8081/<root>/swagger-ui.html
+* Login API (/<root>/api/auth/login)
 Accept json request specifing both username and password and return token that can be used in rest of apis
 ![Login](https://res.cloudinary.com/hafeezmnb/image/upload/v1605518898/login_umgbpk.png)
 
-* LogOut API(api/auth/logout)
+* LogOut API(/<root>/api/auth/logout)
 needs bearer token of authenticated user in header
 ![Logout](https://res.cloudinary.com/hafeezmnb/image/upload/v1605519319/logout_wy23zq.jpg)
 

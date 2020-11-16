@@ -16,8 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
 /**
- * APIAuthenticationEntryPoint.java , this been added to override commence when AuthenticationException is thrown
+ * APIAuthenticationEntryPoint.java , this been added to override commence when
+ * AuthenticationException is thrown
  * 
  * @author Abdalhafeez Bushara
  *
@@ -25,21 +27,22 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @Component
 public class APIAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private final HttpMessageConverter<String> messageConverter;
+	private final HttpMessageConverter<String> messageConverter;
 
-    private final ObjectMapper mapper;
+	private final ObjectMapper mapper;
 
-    public APIAuthenticationEntryPoint(ObjectMapper mapper) {
-        this.messageConverter = new StringHttpMessageConverter();
-        this.mapper = mapper;
-    }
+	public APIAuthenticationEntryPoint(ObjectMapper mapper) {
+		this.messageConverter = new StringHttpMessageConverter();
+		this.mapper = mapper;
+	}
 
-    @Override
-    public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException {
-        Error ApiCommonError = new Error(UNAUTHORIZED);
-        ApiCommonError.setMessage("Invalid Credential. Authentication is required");
-        ServerHttpResponse outputMessage = new ServletServerHttpResponse(httpServletResponse);
-        outputMessage.setStatusCode(HttpStatus.UNAUTHORIZED);
-        messageConverter.write(mapper.writeValueAsString(ApiCommonError), MediaType.APPLICATION_JSON, outputMessage);
-    }
+	@Override
+	public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+			AuthenticationException e) throws IOException {
+		Error ApiCommonError = new Error(UNAUTHORIZED);
+		ApiCommonError.setMessage("Invalid Credential. Authentication is required");
+		ServerHttpResponse outputMessage = new ServletServerHttpResponse(httpServletResponse);
+		outputMessage.setStatusCode(HttpStatus.UNAUTHORIZED);
+		messageConverter.write(mapper.writeValueAsString(ApiCommonError), MediaType.APPLICATION_JSON, outputMessage);
+	}
 }

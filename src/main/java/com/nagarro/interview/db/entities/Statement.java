@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.NoArgsConstructor;
+
 @Entity
 @Table(name = "statement")
 @JsonIgnoreProperties("{id}")
@@ -28,31 +29,37 @@ public class Statement {
 	private String date;
 	@Column(name = "amount")
 	private BigDecimal amount;
-	
+
 	public long getId() {
 		return id;
 	}
+
 	public void setId(long id) {
 		this.id = id;
 	}
+
 	public String getAccountId() {
 		return accountId;
 	}
+
 	public void setAccountId(String accountId) {
 		this.accountId = accountId;
 	}
+
 	public String getDate() {
 		return date;
 	}
+
 	public void setDate(String date) {
 		this.date = date;
 	}
+
 	public BigDecimal getAmount() {
 		return amount;
 	}
+
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
-	
-	
+
 }

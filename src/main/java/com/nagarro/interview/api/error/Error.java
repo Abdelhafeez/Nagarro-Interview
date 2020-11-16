@@ -18,126 +18,117 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-
 @Data
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.CUSTOM, property = "error", visible = true)
 @JsonTypeIdResolver(LowerCaseClassNameResolver.class)
 public class Error {
 
-    private HttpStatus status;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    private LocalDateTime timestamp;
-    private String message;
-    private List<ApiDetailedError> detailedErrors;
+	private HttpStatus status;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+	private LocalDateTime timestamp;
+	private String message;
+	private List<ApiDetailedError> detailedErrors;
 
-    private Error() {
-        timestamp = LocalDateTime.now();
-    }
+	private Error() {
+		timestamp = LocalDateTime.now();
+	}
 
-    public Error(HttpStatus status) {
-        this();
-        this.status = status;
-    }
+	public Error(HttpStatus status) {
+		this();
+		this.status = status;
+	}
 
-    Error(HttpStatus status, Throwable ex) {
-        this();
-        this.status = status;
-        this.message = "Unexpected error";
-    }
+	Error(HttpStatus status, Throwable ex) {
+		this();
+		this.status = status;
+		this.message = "Unexpected error";
+	}
 
-    Error(HttpStatus status, String message, Throwable ex) {
-        this();
-        this.status = status;
-        this.message = message;
-    }
+	Error(HttpStatus status, String message, Throwable ex) {
+		this();
+		this.status = status;
+		this.message = message;
+	}
 
-    private void addSubError(ApiDetailedError subError) {
-        if (detailedErrors == null) {
-        	detailedErrors = new ArrayList<>();
-        }
-        detailedErrors.add(subError);
-    }
+	private void addSubError(ApiDetailedError subError) {
+		if (detailedErrors == null) {
+			detailedErrors = new ArrayList<>();
+		}
+		detailedErrors.add(subError);
+	}
 
-    private void addValidationError(String object, String field, Object rejectedValue, String message) {
-        addSubError(new ApiValidationError( field, rejectedValue, message));
-    }
+	private void addValidationError(String object, String field, Object rejectedValue, String message) {
+		addSubError(new ApiValidationError(field, rejectedValue, message));
+	}
 
-    private void addValidationError(String object, String message) {
-        addSubError(new ApiValidationError(object, message));
-    }
+	private void addValidationError(String object, String message) {
+		addSubError(new ApiValidationError(object, message));
+	}
 
-    private void addValidationError(FieldError fieldError) {
-        this.addValidationError(
-                fieldError.getObjectName(),
-                fieldError.getField(),
-                fieldError.getRejectedValue(),
-                fieldError.getDefaultMessage());
-    }
+	private void addValidationError(FieldError fieldError) {
+		this.addValidationError(fieldError.getObjectName(), fieldError.getField(), fieldError.getRejectedValue(),
+				fieldError.getDefaultMessage());
+	}
 
-    void addValidationErrors(List<FieldError> fieldErrors) {
-        fieldErrors.forEach(this::addValidationError);
-    }
+	void addValidationErrors(List<FieldError> fieldErrors) {
+		fieldErrors.forEach(this::addValidationError);
+	}
 
-    private void addValidationError(ObjectError objectError) {
-        this.addValidationError(
-                objectError.getObjectName(),
-                objectError.getDefaultMessage());
-    }
+	private void addValidationError(ObjectError objectError) {
+		this.addValidationError(objectError.getObjectName(), objectError.getDefaultMessage());
+	}
 
-    void addValidationError(List<ObjectError> globalErrors) {
-        globalErrors.forEach(this::addValidationError);
-    }
+	void addValidationError(List<ObjectError> globalErrors) {
+		globalErrors.forEach(this::addValidationError);
+	}
 
-    /**
-     * Utility method for adding error of ConstraintViolation. Usually when a @Validated validation fails.
-     *
-     * @param cv the ConstraintViolation
-     */
-    private void addValidationError(ConstraintViolation<?> cv) {
-        this.addValidationError(
-                cv.getRootBeanClass().getSimpleName(),
-                ((PathImpl) cv.getPropertyPath()).getLeafNode().asString(),
-                cv.getInvalidValue(),
-                cv.getMessage());
-    }
+	/**
+	 * Utility method for adding error of ConstraintViolation. Usually when
+	 * a @Validated validation fails.
+	 *
+	 * @param cv the ConstraintViolation
+	 */
+	private void addValidationError(ConstraintViolation<?> cv) {
+		this.addValidationError(cv.getRootBeanClass().getSimpleName(),
+				((PathImpl) cv.getPropertyPath()).getLeafNode().asString(), cv.getInvalidValue(), cv.getMessage());
+	}
 
-    void addValidationErrors(Set<ConstraintViolation<?>> constraintViolations) {
-        constraintViolations.forEach(this::addValidationError);
-    }
+	void addValidationErrors(Set<ConstraintViolation<?>> constraintViolations) {
+		constraintViolations.forEach(this::addValidationError);
+	}
 
+	abstract class ApiDetailedError {
 
-    abstract class ApiDetailedError {
+	}
 
-    }
+	@Data
+	@EqualsAndHashCode
+	@AllArgsConstructor
+	class ApiValidationError extends ApiDetailedError {
+		private String field;
+		private Object rejectedValue;
+		private String message;
 
-    @Data
-    @EqualsAndHashCode
-    @AllArgsConstructor
-    class ApiValidationError extends ApiDetailedError {
-        private String field;
-        private Object rejectedValue;
-        private String message;
-
-        ApiValidationError(String object, String message) {
-            this.message = message;
-        }
-    }
+		ApiValidationError(String object, String message) {
+			this.message = message;
+		}
+	}
 }
 
 class LowerCaseClassNameResolver extends TypeIdResolverBase {
 
-    @Override
-    public String idFromValue(Object value) {
-        return value.getClass().getSimpleName().toLowerCase();
-    }
+	@Override
+	public String idFromValue(Object value) {
+		return value.getClass().getSimpleName().toLowerCase();
+	}
 
-    @Override
-    public String idFromValueAndType(Object value, Class<?> suggestedType) {
-        return idFromValue(value);
-    }
+	@Override
+	public String idFromValueAndType(Object value, Class<?> suggestedType) {
+		return idFromValue(value);
+	}
 
-    @Override
-    public JsonTypeInfo.Id getMechanism() {
-        return JsonTypeInfo.Id.CUSTOM;
-    }
+	@Override
+	public JsonTypeInfo.Id getMechanism() {
+		return JsonTypeInfo.Id.CUSTOM;
+	}
 }
