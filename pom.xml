@@ -7,7 +7,7 @@
 	<groupId>com.nagarro</groupId>
 	<artifactId>nagaroo-interview</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
 	<name>nagarro-account-api</name>
 	<description>REST backend for nagaroo interview challenge</description>
