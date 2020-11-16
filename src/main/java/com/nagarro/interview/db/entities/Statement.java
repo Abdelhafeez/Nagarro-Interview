@@ -11,9 +11,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "statement")
 @JsonIgnoreProperties("{id}")
+@NoArgsConstructor
 public class Statement {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

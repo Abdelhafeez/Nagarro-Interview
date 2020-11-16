@@ -1,10 +1,16 @@
 package com.nagarro.interview.controller;
 
+import static org.junit.Assert.assertThat;
+
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.After;
@@ -26,9 +32,14 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nagarro.interview.SimpleTestCase;
 import com.nagarro.interview.api.model.ViewStatementRequest;
+import com.nagarro.interview.api.model.ViewStatementResponse;
 import com.nagarro.interview.authentication.entities.LoginRequest;
+import com.nagarro.interview.db.entities.Statement;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,7 +59,7 @@ public class StatementApiIntegrationTests {
 	 * Test with No Bearer Token Expected : Unauthorized
 	 */
 	@Test
-	public void testingAPIUseCases() throws URISyntaxException {
+	public void testingAPIUseCases() throws URISyntaxException, JsonParseException, JsonMappingException, IOException {
 		log.info("(1)Testing Unauthorized access");
 		RestTemplate restTemplate = new RestTemplate();
 		ViewStatementRequest request = new ViewStatementRequest("1234", null, null, null, null);
@@ -57,11 +68,11 @@ public class StatementApiIntegrationTests {
 		HttpEntity<ViewStatementRequest> requestObj = new HttpEntity<>(request, headers);
 		final String baseUrl = "http://localhost:" + randomServerPort + "/api/fetch";
 		URI uri = new URI(baseUrl);
-		ResponseEntity<String> result;
+		ResponseEntity<ViewStatementResponse> result;
 		try {
-			result = restTemplate.postForEntity(uri, requestObj, String.class);
+			result = restTemplate.postForEntity(uri, requestObj, ViewStatementResponse.class);
 		} catch (HttpClientErrorException | HttpServerErrorException httpClientOrServerExc) {
-			result = new ResponseEntity<String>(httpClientOrServerExc.getStatusCode());
+			result = new ResponseEntity<ViewStatementResponse>(httpClientOrServerExc.getStatusCode());
 		}
 
 		// Verify request succeed
@@ -81,7 +92,7 @@ public class StatementApiIntegrationTests {
 	}
 
 	
-	void runTest(SimpleTestCase test, int i,URI uri) {
+	void runTest(SimpleTestCase test, int i,URI uri) throws JsonParseException, JsonMappingException, IOException {
 		ResponseEntity<String> result;
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -104,6 +115,43 @@ public class StatementApiIntegrationTests {
 
 		// Verify request succeed
 		Assert.assertEquals(test.getExpectedHttpResponse(), result.getStatusCodeValue());
+		if(result.getStatusCodeValue()==200)
+		{
+			System.out.println("**********************88");
+			System.out.println("**********************"+result.getBody().toString());
+
+			ViewStatementRequest r =test.getRequestTestCase();
+			ObjectMapper objectMapper = new ObjectMapper();
+			ViewStatementResponse respObj = objectMapper.readValue(result.getBody().toString(), ViewStatementResponse.class);	
+			//make sure that the data is consistent
+			if(respObj.getStatement()!=null &&respObj.getStatement().size()>0 )
+			{
+				
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+				LocalDate beforePeriod = LocalDate.now().minusMonths(3);
+
+				List<Statement> st=respObj.getStatement();
+			      List<Statement> results = st.stream()               
+			              .filter(statement ->
+			              (test.getRequestTestCase().getFromAmount()==null?true:(r.getFromAmount().compareTo(statement.getAmount())>0
+			            		  && r.getFromAmount().compareTo(statement.getAmount())<0
+			            		  )
+			              //Filter by date
+			              &&
+			              (	      
+			            		  test.getRequestTestCase().getFromDate()==null?
+			            	(beforePeriod.compareTo(LocalDate.parse(statement.getDate(), formatter))<0)
+			            	:
+			            	  
+			            	  (r.getFromDate()).compareTo(LocalDate.parse(statement.getDate(), formatter))>0
+			            		  && r.getFromDate().compareTo(LocalDate.parse(statement.getDate(), formatter))<0
+			            		  ))
+			            		     
+			              ).collect(Collectors.toList());             
+
+			  assert(st.equals(results));
+			}
+		}
 		log.info("(" + i + ")Test ended");
 		log.info("-------------------------------------------");
 	}
@@ -111,6 +159,8 @@ public class StatementApiIntegrationTests {
 	@Before
 	public void setup() throws InterruptedException, URISyntaxException {
 		cases = new ArrayList<>();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
 		cases.add(new SimpleTestCase(new ViewStatementRequest("0012250016001", null, null, null, null), 200, "user"));
 		cases.add(new SimpleTestCase(
 				new ViewStatementRequest("0012250019001", null, null, BigDecimal.valueOf(2d), BigDecimal.valueOf(300d)),
@@ -122,6 +172,9 @@ public class StatementApiIntegrationTests {
 		cases.add(new SimpleTestCase(
 				new ViewStatementRequest("0012250016001", null, null, BigDecimal.valueOf(6d), BigDecimal.valueOf(3d)),
 				400, "admin"));
+		cases.add(new SimpleTestCase(
+				new ViewStatementRequest("0012250016001", LocalDate.parse("01.01.1993", formatter), LocalDate.parse("01.01.2020", formatter), null, null),
+				200, "admin"));
 		// wait for tokens created by other test case (loginControllerTests.java) to expire
 		Thread.sleep(5000);
 		adminToken = getToken(new LoginRequest("testadmin", "adminpassword"));
