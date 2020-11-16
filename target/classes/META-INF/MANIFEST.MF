@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: nagarro-account-api
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: ABdalhafeez
+Implementation-Vendor-Id: com.nagarro
+Build-Jdk: 1.8.0_211
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/nagaroo-interview
+Created-By: Maven Integration for Eclipse
+
